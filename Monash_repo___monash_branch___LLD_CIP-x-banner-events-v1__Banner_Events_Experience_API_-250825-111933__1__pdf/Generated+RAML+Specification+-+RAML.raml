@@ -1,0 +1,228 @@
+```yaml
+#%RAML 1.0
+title: Banner Events Experience API
+description: Experience API to retrieve modified Banner details.
+baseUri: https://api.example.com/v1
+version: v1
+mediaType: application/json
+securitySchemes:
+  clientID:
+    type: OAuth 2.0
+    describedBy:
+      headers:
+        Authorization:
+          description: Client ID enforcement
+          type: string
+      responses:
+        401:
+          description: Unauthorized
+
+/types:
+  ErrorResponse:
+    type: object
+    properties:
+      correlationId: string
+      message: string
+      errorType: string
+      additionalDetails: string
+    example:
+      correlationId: "945e4740-6795-11f0-8f9f-dc4546dcaff0"
+      message: "Invalid eventType received."
+      errorType: "APP:BAD_REQUEST"
+      additionalDetails: "Expected: studentAddress, but received: <eventType>"
+
+  UnitOfLearningAvailability:
+    type: object
+    properties:
+      id: string
+      published: string
+      resource:
+        type: object
+        properties:
+          name: string
+          id: string
+          version: string
+      operation: string
+      contentType: string
+      messageType: string
+      content:
+        type: object
+        properties:
+          crn: string
+          termCode: string
+          id: string
+      publisher:
+        type: object
+        properties:
+          id: string
+          applicationName: string
+          tenant:
+            type: object
+            properties:
+              id: string
+              alias: string
+              name: string
+              environment: string
+    example:
+      id: "8"
+      published: "2025-03-27T01:19:40.651268+00"
+      resource:
+        name: "course-section-information"
+        id: "113ffb41-bcd7-4dbf-9c44-268010f1ce49"
+        version: "application/vnd.hedtech.integration.v16.1.0+json"
+      operation: "replaced"
+      contentType: "resource-representation"
+      messageType: "change-notification"
+      content:
+        crn: "1"
+        termCode: "202430"
+        id: "113ffb41-bcd7-4dbf-9c44-268010f1ce49"
+      publisher:
+        id: "30a25dd7-35c9-439b-bad5-2ce662da3c38"
+        applicationName: "Student API TEST"
+        tenant:
+          id: "4b09dbf7-056d-4985-81d8-f58aac95cc0b"
+          alias: "matest"
+          name: "Monash University (AUS)"
+          environment: "Test"
+
+  StudentAddressUpdate:
+    type: object
+    properties:
+      eventId: string
+      eventType: string
+      operation: string
+      timestamp: string
+      content:
+        type: object
+        properties:
+          studentAddress:
+            type: object
+            properties:
+              studentId: string
+              lastModifiedDate: string
+    example:
+      eventId: "evt-20250704-00123"
+      eventType: "studentAddress"
+      operation: "UPDATE"
+      timestamp: "2025-07-04T10:15:30Z"
+      content:
+        studentAddress:
+          studentId: "25996991"
+          lastModifiedDate: "2021-11-09T11:39:05Z"
+
+  StagedStudyApplication:
+    type: object
+    properties:
+      eventId: string
+      eventType: string
+      operation: string
+      timestamp: string
+      content:
+        type: object
+        properties:
+          studyApplication:
+            type: object
+            properties:
+              applicationStagingId: string
+              applicationExternalId: string
+              smsApplicationId: string
+              smsApplicationNumber: string
+              personManagerId: string
+              bannerId: string
+              templateCode: string
+              submissionConfirmationCode: string
+              transferStatus: string
+              errors:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    code: string
+                    description: string
+                    message: string
+              lastModifiedDate: string
+    example:
+      eventId: "evt-20250807-12345"
+      eventType: "stagedStudyApplication"
+      operation: "UPDATE"
+      timestamp: "2025-08-08T12:18:30Z"
+      content:
+        studyApplication:
+          applicationStagingId: "7cadm64d-f5bf-4829-b433-6e100287edfe"
+          applicationExternalId: "10085"
+          smsApplicationId: "23bf2d5c-7968-42ab-9455-a71eeb79420d"
+          smsApplicationNumber: "1"
+          personManagerId: "45bf2d8c-7968-42ab-9455-a71eeb74570d"
+          bannerId: "A1000085"
+          templateCode: "MONASHIMPORTTEMPLATEV8"
+          submissionConfirmationCode: "my.app"
+          transferStatus: "COMPLETE"
+          errors: []
+          lastModifiedDate: "2023-05-08T15:39:09Z"
+
+/events/unit-of-learning-availabilities:
+  post:
+    description: Publish Unit of Learning Availability events.
+    body:
+      application/json: 
+        type: UnitOfLearningAvailability
+    responses:
+      202:
+        body:
+          application/json:
+            type: object
+            properties:
+              correlationId: string
+              message: string
+            example:
+              correlationId: "9d2dee33-7803-485a-a2b1-2c7538e597ee"
+              message: "Event Received"
+      400:
+        body:
+          type: ErrorResponse
+
+/events/student-addresses:
+  post:
+    description: Publish Student Address update events.
+    body:
+      application/json: 
+        type: StudentAddressUpdate
+    responses:
+      202:
+        body:
+          application/json:
+            type: object
+            properties:
+              correlationId: string
+              message: string
+            example:
+              correlationId: "e370a0390-42b090-1109ec-9fe19-803f90095d04a406"
+              message: "Event Received"
+      400:
+        body:
+          type: ErrorResponse
+
+/events/staged-study-applications:
+  post:
+    description: Publish Staged Study Application events.
+    body:
+      application/json: 
+        type: StagedStudyApplication
+    responses:
+      202:
+        body:
+          application/json:
+            type: object
+            properties:
+              correlationId: string
+              message: string
+            example:
+              correlationId: "9d2dee33-7803-485a-a2b1-2c7538e597ee"
+              message: "Event Received"
+      400:
+        body:
+          type: ErrorResponse
+```
+
+This RAML specification includes the necessary details as per the provided Low-Level Design. Each endpoint is clearly defined with request and response types, along with error handling. The types and examples are structured for clarity and ease of use.
